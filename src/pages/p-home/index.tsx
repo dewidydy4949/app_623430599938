@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './styles.module.css';
 import { audioConfigs, getAudioUrl, getFallbackAudioUrl } from '../../config/audioConfig';
 import { Navigation } from '../../components/Navigation';
@@ -454,7 +454,6 @@ const HomePage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {recommendations.map((item) => {
-                const isPlaying = currentPlayingId === item.id;
                 const imageUrls = [
                   'https://s.coze.cn/image/nZ4Ah7aGp_I/',
                   'https://s.coze.cn/image/tyWQGnDwbnU/',

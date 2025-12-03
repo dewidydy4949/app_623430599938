@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './styles.module.css';
 import { getRandomHealingImage } from '../../config/healingImages';
@@ -18,7 +18,6 @@ const PResultPage: React.FC = () => {
   const [totalTime, setTotalTime] = useState(330); // 默认5分30秒，单位秒
   const [volume, setVolume] = useState(70);
   const [isBgmEnabled, setIsBgmEnabled] = useState(true);
-  const audioIntervalRef = useRef<number | null>(null);
   
   // 交互状态
   const [isLiked, setIsLiked] = useState(false);
@@ -33,7 +32,7 @@ const PResultPage: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // 治愈系图片（每次加载时随机选择）
-  const [healingImage, setHealingImage] = useState(() => getRandomHealingImage());
+  const healingImage = useMemo(() => getRandomHealingImage(), []);
 
   // 设置页面标题
   useEffect(() => {
@@ -48,8 +47,6 @@ const PResultPage: React.FC = () => {
   useEffect(() => {
     const updateGenerationTime = () => {
       const now = new Date();
-      // 使用北京时间（UTC+8）
-      const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
