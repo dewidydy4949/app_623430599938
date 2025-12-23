@@ -1,49 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode } from 'react';
 import styles from './PageTransition.module.css';
 
 interface PageTransitionProps {
-  children: React.ReactNode;
-  isEntering?: boolean;
-  duration?: number;
+  children: ReactNode;
+  type?: 'fade' | 'slide-up' | 'slide-down' | 'scale' | 'immersive';
 }
 
 const PageTransition: React.FC<PageTransitionProps> = ({ 
   children, 
-  isEntering = true,
-  duration = 600 
+  type = 'fade' 
 }) => {
-  const [mounted, setMounted] = useState(false);
-  const [animationClass, setAnimationClass] = useState('');
-
-  useEffect(() => {
-    setMounted(true);
-    
-    if (isEntering) {
-      setAnimationClass(styles.enter);
-      const timer = setTimeout(() => {
-        setAnimationClass(styles.enterActive);
-      }, 50);
-      
-      return () => clearTimeout(timer);
-    } else {
-      setAnimationClass(styles.exit);
-      const timer = setTimeout(() => {
-        setAnimationClass(styles.exitActive);
-      }, 50);
-      
-      return () => clearTimeout(timer);
+  const getTransitionClass = () => {
+    switch (type) {
+      case 'slide-up':
+        return styles.slideUp;
+      case 'slide-down':
+        return styles.slideDown;
+      case 'scale':
+        return styles.scale;
+      case 'immersive':
+        return styles.immersive;
+      default:
+        return styles.fade;
     }
-  }, [isEntering]);
-
-  if (!mounted) {
-    return <div className={styles.container} style={{ opacity: 0 }} />;
-  }
+  };
 
   return (
-    <div 
-      className={`${styles.container} ${animationClass}`}
-      style={{ transitionDuration: `${duration}ms` }}
-    >
+    <div className={`${styles.pageTransition} ${getTransitionClass()}`}>
       {children}
     </div>
   );

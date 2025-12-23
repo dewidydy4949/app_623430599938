@@ -6,28 +6,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 暖色调多巴胺配色 - 温暖、充满活力、给人欢喜感
-        primary: '#FF6B6B',      // 暖珊瑚红（主色）- 温暖粉红色
-        secondary: '#FF8E53',    // 暖橙色（辅助色）- 明亮橙色
-        tertiary: '#FFD93D',     // 暖黄色 - 明亮黄色
-        accent: '#FFB84D',        // 暖金黄色（强调色）- 温暖金色
-        success: '#6BCB77',      // 暖绿色 - 柔和绿色
-        danger: '#FF6B6B',       // 暖红色 - 珊瑚红
-        warning: '#FFA500',      // 暖橙色 - 标准橙色
-        info: '#FF8C69',         // 暖鲑鱼色 - 温暖粉橙色
-        'text-primary': '#2C1810',    // 深暖棕色（主文字）
-        'text-secondary': '#5A4A3A',   // 中暖棕色（次要文字）
-        'text-tertiary': '#7A6A5A',   // 浅暖棕色（辅助文字）
-        'bg-primary': '#FEF9F3',      // 柔和奶油色（主背景）- Headspace风格
-        'bg-secondary': '#FFF8F0',     // 极浅暖白色（次背景）
-        'bg-tertiary': '#FFF5E6',     // 浅暖白色
-        'glass-bg': 'rgba(255, 255, 255, 0.7)',  // 毛玻璃背景
-        'bg-accent': '#FFF8E0',       // 极浅的黄色背景（强调背景）
-        'border-light': '#FFD4B3',    // 暖粉色边框
-        'border-medium': '#FFB88C',   // 暖橙色边框
-        'card-bg': '#FFFFFF',          // 纯白色
-        'gradient-start': '#FFD4B3',   // 渐变起始色（暖粉色）
-        'gradient-end': '#FFB88C'      // 渐变结束色（暖橙色）
+        // 深色疗愈配色 - 保护弱光环境下的视力
+        primary: '#6366F1',      // 靛蓝色（主色）- 平静舒缓
+        secondary: '#8B5CF6',    // 紫色（辅助色）- 放松身心
+        tertiary: '#EC4899',     // 粉紫色 - 温柔安抚
+        accent: '#06B6D4',       // 青色（强调色）- 清新宁静
+        success: '#10B981',      // 绿色 - 平和自然
+        danger: '#F43F5E',       // 红色 - 温和警示
+        warning: '#F59E0B',      // 琥珀色 - 柔和提醒
+        info: '#3B82F6',         // 蓝色 - 沉静信赖
+        'text-primary': '#F8FAFC',    // 灰白色（主文字）- 柔和易读
+        'text-secondary': '#CBD5E1',   // 中灰色（次要文字）- 低调优雅
+        'text-tertiary': '#94A3B8',   // 深灰色（辅助文字）- 背景融合
+        'bg-primary': '#0F172A',      // 深蓝黑色（主背景）- AMOLED友好
+        'bg-secondary': '#1E293B',     // 深蓝色（次背景）- 层次分明
+        'bg-tertiary': '#334155',     // 中深蓝色 - 界面元素
+        'glass-bg': 'rgba(30, 41, 59, 0.7)',  // 深色毛玻璃背景
+        'bg-accent': '#1E3A8A',       // 深靛蓝色（强调背景）
+        'border-light': '#334155',    // 深蓝色边框
+        'border-medium': '#475569',   // 中蓝色边框
+        'card-bg': '#1E293B',          // 深蓝色卡片
+        'gradient-start': '#1E3A8A',   // 渐变起始色（深靛蓝）
+        'gradient-end': '#312E81'      // 渐变结束色（深紫色）
       },
       boxShadow: {
         // 简约的阴影 - 更柔和、更微妙

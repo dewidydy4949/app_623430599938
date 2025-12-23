@@ -1,265 +1,217 @@
-/* 沉浸式疗愈页面样式 - 数字安眠药体验 */
-
-.healingWrapper {
-  background: #0F172A;
-  color: #F8FAFC;
-  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+/* 沉浸式疗愈页面样式 */
+.immersiveHealing {
+  font-family: 'Georgia', 'Times New Roman', serif; /* 衬线体，增加人文关怀感 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* 背景容器 */
 .backgroundContainer {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  overflow: hidden;
-}
-
-/* 背景占位符 - 替代实际视频 */
-.backgroundPlaceholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.9) 0%,
-    rgba(30, 41, 59, 0.8) 25%,
-    rgba(51, 65, 85, 0.7) 50%,
-    rgba(30, 41, 59, 0.8) 75%,
-    rgba(15, 23, 42, 0.9) 100%
-  );
-  position: relative;
+  z-index: -2;
 }
 
-.backgroundPlaceholder::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
-  animation: backgroundShift 20s ease-in-out infinite alternate;
-}
-
-@keyframes backgroundShift {
-  0% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 0.8;
-  }
-}
-
+/* 背景图案（使用 CSS 渐变模拟视频背景） */
 .backgroundOverlay {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 各种心情背景样式 */
+.bg-rain-window {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+}
+
+.bg-fireplace {
+  background: linear-gradient(135deg, #7c2d12 0%, #451a03 50%, #7c2d12 100%);
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(251, 146, 60, 0.2) 0%, transparent 70%),
+    linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+}
+
+.bg-night-sky {
+  background: linear-gradient(135deg, #0c0a09 0%, #1e1b4b 50%, #0c0a09 100%);
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #0c0a09 0%, #1e1b4b 50%, #0c0a09 100%);
+}
+
+.bg-gentle-rain {
+  background: linear-gradient(135deg, #475569 0%, #1e293b 50%, #475569 100%);
+  background-image: 
+    radial-gradient(circle at 30% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 60%),
+    linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+}
+
+.bg-calm-lake {
+  background: linear-gradient(135deg, #082f49 0%, #0c4a6e 50%, #082f49 100%);
+  background-image: 
+    radial-gradient(circle at 60% 40%, rgba(6, 182, 212, 0.1) 0%, transparent 60%),
+    linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+}
+
+.bg-forest-breeze {
+  background: linear-gradient(135deg, #14532d 0%, #166534 50%, #14532d 100%);
+  background-image: 
+    radial-gradient(circle at 40% 60%, rgba(34, 197, 94, 0.1) 0%, transparent 60%),
+    linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+}
+
+/* 暗角效果 */
+.vignette {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(15, 23, 42, 0.3) 0%,
-    rgba(15, 23, 42, 0.7) 100%
-  );
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 200px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+/* 音频控制按钮 */
+.audioButton {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8fafc;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.audioButton:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(99, 102, 241, 0.4);
+  transform: scale(1.05);
+}
+
+.audioButton.active {
+  border-color: rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+/* 返回按钮 */
+.backButton {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  width: 48px;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(71, 85, 105, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8fafc;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  background: rgba(239, 68, 68, 0.8);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: scale(1.05);
 }
 
 /* 主内容区域 */
 .mainContent {
   position: relative;
   z-index: 10;
-  width: 100%;
-  max-width: 800px;
-  padding: 2rem;
-  text-align: center;
-}
-
-.contentContainer {
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 80vh;
+  padding: 120px 24px 80px;
 }
 
-/* 标题区域 */
-.title {
-  margin-bottom: 3rem;
+/* 心情标题 */
+.moodHeader {
   opacity: 0;
   transform: translateY(30px);
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 1.5s ease;
 }
 
-.title.visible {
+.moodHeader.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.title h1 {
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+/* 文本容器 */
+.textContainer {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 心情标签 */
-.moodBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50px;
-  font-size: 0.95rem;
+/* 疗愈文本样式 */
+.healingText {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  color: rgba(248, 250, 252, 0.95);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-weight: 300;
+  letter-spacing: 0.02em;
   opacity: 0;
   transform: translateY(20px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+  transition: all 2s ease;
 }
 
-.moodBadge.visible {
+.healingText.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* 文本内容区域 */
-.textContent {
-  margin-bottom: 4rem;
-  max-width: 650px;
-  padding: 2rem;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.healingText.typing {
+  opacity: 0.9;
 }
 
-.textParagraph {
-  font-size: 1.35rem;
-  line-height: 1.9;
-  color: rgba(248, 250, 252, 0.95);
-  margin-bottom: 2.5rem;
-  opacity: 0;
-  transform: translateY(30px);
-  animation: inkFadeIn 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  font-family: 'Noto Serif SC', 'Georgia', 'Times New Roman', serif;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  position: relative;
-  min-height: 3em;
-}
-
-.textParagraph.loading {
-  animation: loadingPulse 1.5s ease-in-out infinite;
-}
-
-.textParagraph.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.textParagraph.typing {
-  animation: none;
-  opacity: 1;
-  transform: translateY(0);
-}
-
+/* 打字机光标 */
 .cursor {
   display: inline-block;
-  animation: cursorBlink 1s infinite;
-  color: rgba(248, 250, 252, 0.8);
-  font-weight: bold;
+  width: 2px;
+  height: 1.2em;
+  background: rgba(248, 250, 252, 0.6);
   margin-left: 2px;
+  animation: blink 1s infinite;
 }
 
-.textParagraph::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(248, 250, 252, 0.2) 50%,
-    transparent 100%
-  );
-  animation: lineExpand 1.5s ease-out forwards;
-  animation-delay: 0.5s;
-}
-
-@keyframes inkFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(30px) scale(0.98);
-    filter: blur(2px);
-  }
-  30% {
-    opacity: 0.3;
-    transform: translateY(15px) scale(0.99);
-    filter: blur(1px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes lineExpand {
-  0% {
-    transform: scaleX(0);
-    opacity: 0;
-  }
-  100% {
-    transform: scaleX(1);
-    opacity: 1;
-  }
-}
-
-@keyframes loadingPulse {
-  0%, 100% {
-    opacity: 0.4;
-    transform: translateY(30px) scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: translateY(28px) scale(1.01);
-  }
-}
-
-@keyframes cursorBlink {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0;
-  }
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 /* 底部操作区域 */
 .bottomActions {
   opacity: 0;
   transform: translateY(30px);
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
-  margin-top: auto;
+  transition: all 1.5s ease 0.5s;
 }
 
 .bottomActions.visible {
@@ -267,53 +219,46 @@
   transform: translateY(0);
 }
 
-/* "我想多说两句" 按钮 */
+/* "我想多说两句"按钮 */
 .talkMoreButton {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 24px;
+  padding: 12px 24px;
   color: rgba(248, 250, 252, 0.8);
-  padding: 1rem 2rem;
-  border-radius: 50px;
-  font-size: 0.95rem;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: inline-flex;
-  align-items: center;
-  font-weight: 300;
-  letter-spacing: 0.01em;
+  transition: all 0.3s ease;
 }
 
 .talkMoreButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(99, 102, 241, 0.4);
   color: rgba(248, 250, 252, 1);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* 输入容器 */
 .inputContainer {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 16px;
+  padding: 16px;
   max-width: 500px;
-  width: 100%;
   margin: 0 auto;
 }
 
+/* 文本输入框 */
 .textInput {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #F8FAFC;
-  padding: 1rem;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(71, 85, 105, 0.2);
   border-radius: 12px;
-  font-size: 1rem;
+  padding: 12px 16px;
+  color: #f8fafc;
+  font-size: 14px;
   line-height: 1.5;
   resize: none;
   outline: none;
@@ -322,51 +267,49 @@
 }
 
 .textInput::placeholder {
-  color: rgba(248, 250, 252, 0.5);
+  color: rgba(148, 163, 184, 0.6);
 }
 
 .textInput:focus {
-  border-color: rgba(99, 102, 241, 0.5);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(30, 41, 59, 0.8);
 }
 
+/* 输入操作按钮 */
 .inputActions {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 12px;
+  margin-top: 12px;
   justify-content: flex-end;
 }
 
-.cancelButton,
-.submitButton {
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  font-size: 0.9rem;
+.cancelButton, .submitButton {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
-  font-weight: 300;
 }
 
 .cancelButton {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(248, 250, 252, 0.7);
+  background: rgba(71, 85, 105, 0.6);
+  color: rgba(248, 250, 252, 0.8);
 }
 
 .cancelButton:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(71, 85, 105, 0.8);
   color: rgba(248, 250, 252, 1);
 }
 
 .submitButton {
-  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
 }
 
 .submitButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5558E3 0%, #7C4CE8 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .submitButton:disabled {
@@ -374,257 +317,87 @@
   cursor: not-allowed;
 }
 
-/* 音频控制按钮 - 精致版 */
-.audioControl {
+/* 粒子效果 */
+.particleContainer {
   position: fixed;
-  top: 2rem;
-  right: 2rem;
-  z-index: 100;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: rgba(248, 250, 252, 0.9);
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.audioControl::before {
-  content: '';
-  position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.audioControl:hover {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(148, 163, 184, 0.4);
-  color: rgba(248, 250, 252, 1);
-  transform: scale(1.05);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.audioControl:hover::before {
-  opacity: 1;
-}
-
-.audioControl.playing {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-  border-color: rgba(99, 102, 241, 0.3);
-  animation: audioPlayingGlow 3s ease-in-out infinite;
-}
-
-.audioControl.playing::after {
-  content: '';
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: #10B981;
-  border-radius: 50%;
-  bottom: 8px;
-  right: 8px;
-  animation: audioPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes audioPlayingGlow {
-  0%, 100% {
-    box-shadow: 
-      0 4px 20px rgba(0, 0, 0, 0.3),
-      0 0 15px rgba(99, 102, 241, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-  50% {
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 25px rgba(99, 102, 241, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  }
-}
-
-@keyframes audioPulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.2);
-  }
-}
-
-/* 返回按钮 */
-.backButton {
-  position: fixed;
-  top: 2rem;
-  left: 2rem;
-  z-index: 100;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(248, 250, 252, 0.8);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-}
-
-.backButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: rgba(248, 250, 252, 1);
-  transform: translateX(-2px);
-}
-
-/* 装饰性元素 */
-.decorativeElements {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
   pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
 }
 
-.floatingOrb {
+.particle {
   position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(248, 250, 252, 0.3);
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
-  animation: float 8s ease-in-out infinite;
+  animation: float-up 10s infinite linear;
 }
 
-.orb1 {
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, #6366F1 0%, transparent 70%);
-  top: 10%;
-  left: 10%;
-  animation-delay: 0s;
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px);
+    opacity: 0;
+  }
 }
 
-.orb2 {
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, #8B5CF6 0%, transparent 70%);
-  bottom: 20%;
-  right: 15%;
-  animation-delay: 2.5s;
-}
-
-.orb3 {
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, #EC4899 0%, transparent 70%);
-  top: 60%;
-  left: 70%;
-  animation-delay: 5s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.15;
-  }
-  25% {
-    transform: translate(30px, -40px) scale(1.1);
-    opacity: 0.2;
-  }
-  50% {
-    transform: translate(-20px, 30px) scale(0.9);
-    opacity: 0.1;
-  }
-  75% {
-    transform: translate(-40px, -20px) scale(1.05);
-    opacity: 0.18;
-  }
-}
+/* 为不同粒子设置不同的起始位置和动画延迟 */
+.particle-1 { left: 10%; animation-delay: 0s; }
+.particle-2 { left: 20%; animation-delay: 1s; }
+.particle-3 { left: 30%; animation-delay: 2s; }
+.particle-4 { left: 40%; animation-delay: 3s; }
+.particle-5 { left: 50%; animation-delay: 4s; }
+.particle-6 { left: 60%; animation-delay: 5s; }
+.particle-7 { left: 70%; animation-delay: 6s; }
+.particle-8 { left: 80%; animation-delay: 7s; }
+.particle-9 { left: 90%; animation-delay: 8s; }
+.particle-10 { left: 15%; animation-delay: 9s; }
+.particle-11 { left: 25%; animation-delay: 0.5s; }
+.particle-12 { left: 35%; animation-delay: 1.5s; }
+.particle-13 { left: 45%; animation-delay: 2.5s; }
+.particle-14 { left: 55%; animation-delay: 3.5s; }
+.particle-15 { left: 65%; animation-delay: 4.5s; }
+.particle-16 { left: 75%; animation-delay: 5.5s; }
+.particle-17 { left: 85%; animation-delay: 6.5s; }
+.particle-18 { left: 5%; animation-delay: 7.5s; }
+.particle-19 { left: 95%; animation-delay: 8.5s; }
+.particle-20 { left: 50%; animation-delay: 9.5s; }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .mainContent {
-    padding: 1rem;
+  .healingText {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   }
   
-  .title h1 {
-    font-size: 2rem;
-  }
-  
-  .textParagraph {
-    font-size: 1.1rem;
-    line-height: 1.7;
-  }
-  
-  .audioControl {
-    width: 50px;
-    height: 50px;
-    top: 1rem;
-    right: 1rem;
-    font-size: 1rem;
+  .audioButton {
+    top: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
   }
   
   .backButton {
-    width: 45px;
-    height: 45px;
-    top: 1rem;
-    left: 1rem;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
   }
   
-  .inputContainer {
-    margin: 0 1rem;
-    padding: 1rem;
-  }
-  
-  .inputActions {
-    flex-direction: column;
-  }
-  
-  .cancelButton,
-  .submitButton {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-/* 深色主题优化 */
-@media (prefers-color-scheme: dark) {
-  .healingWrapper {
-    background: #020617;
-  }
-  
-  .backgroundPlaceholder {
-    background: linear-gradient(
-      135deg,
-      rgba(2, 6, 23, 0.95) 0%,
-      rgba(15, 23, 42, 0.9) 25%,
-      rgba(30, 41, 59, 0.8) 50%,
-      rgba(15, 23, 42, 0.9) 75%,
-      rgba(2, 6, 23, 0.95) 100%
-    );
+  .mainContent {
+    padding: 100px 16px 60px;
   }
 }
