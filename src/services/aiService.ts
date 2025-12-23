@@ -1,180 +1,94 @@
-export interface AIResponse {
+import Groq from 'groq-sdk';
+
+const groq = new Groq({
+  apiKey: import.meta.env.VITE_GROQ_API_KEY || '',
+  dangerouslyAllowBrowser: true,
+});
+
+export interface HealingTextRequest {
+  mood: string;
+  reason: string;
+  userInput?: string; // 用户自定义输入
+}
+
+export interface HealingTextResponse {
+  text: string;
   success: boolean;
-  message: string;
-  data?: any;
   error?: string;
 }
 
-export interface EmotionAnalysis {
-  emotion: string;
-  confidence: number;
-  suggestions: string[];
-  musicRecommendations: string[];
-}
+const SYSTEM_PROMPT_BASE = `你是一位深夜的"情绪疗愈师"和"守夜人"。你的声音温柔、低沉、富有磁性。
 
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+Tone: 温暖、接纳、像散文诗一样优美，绝对不要说教，不要给具体的解决方案（除非用户明确要求），而是提供情感上的陪伴。
 
-class AIService {
-  private baseUrl: string;
-  private apiKey: string;
+Constraint:
+- 输出必须少于100个字（保持短小精悍，适合屏幕阅读）
+- 不要使用"你好"、"我是AI"等开场白，直接输出疗愈内容
+- 语言风格：现代诗歌感，或者像深夜电台的主持人
+- 必须使用中文回复`;
 
-  constructor() {
-    this.baseUrl = process.env.REACT_APP_AI_API_URL || 'https://api.openai.com/v1';
-    this.apiKey = process.env.REACT_APP_AI_API_KEY || '';
-  }
+const SYSTEM_PROMPT_USER_INPUT = `用户正在向你倾诉具体问题。请针对他的话，给出一段温暖、有深度且不带说教的安抚。
 
-  async analyzeEmotion(text: string): Promise<AIResponse> {
-    try {
-      // 模拟情感分析
-      const emotions = ['happy', 'sad', 'calm', 'energetic', 'anxious'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      
-      const analysis: EmotionAnalysis = {
-        emotion: randomEmotion,
-        confidence: Math.random() * 0.3 + 0.7, // 0.7-1.0
-        suggestions: [
-          '深呼吸，放松身心',
-          '听一些舒缓的音乐',
-          '做一些轻柔的运动',
-          '与朋友聊聊天'
-        ],
-        musicRecommendations: [
-          'piano-meditation-1',
-          'piano-forest-1',
-          'piano-sleep-1'
-        ]
-      };
+Tone: 温暖、接纳、像散文诗一样优美，绝对不要说教，不要给具体的解决方案（除非用户明确要求），而是提供情感上的陪伴。
 
-      return {
-        success: true,
-        message: '情感分析完成',
-        data: analysis
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: '情感分析失败',
-        error: error instanceof Error ? error.message : '未知错误'
-      };
+Constraint:
+- 输出必须少于100个字（保持短小精悍，适合屏幕阅读）
+- 不要使用"你好"、"我是AI"等开场白，直接输出疗愈内容
+- 语言风格：现代诗歌感，或者像深夜电台的主持人
+- 必须使用中文回复`;
+
+export async function fetchHealingText({ mood, reason, userInput }: HealingTextRequest): Promise<HealingTextResponse> {
+  try {
+    let userPrompt: string;
+    let systemPrompt: string;
+
+    if (userInput && userInput.trim()) {
+      // 用户有自定义输入，使用专门的系统提示词
+      systemPrompt = SYSTEM_PROMPT_USER_INPUT;
+      userPrompt = `用户的主情绪是：${mood}，具体原因是：${reason}。用户向你倾诉：${userInput}。请针对他的倾诉给出温暖的安抚。`;
+    } else {
+      // 初始生成，使用基础提示词
+      systemPrompt = SYSTEM_PROMPT_BASE;
+      userPrompt = `用户的主情绪是：${mood}。具体原因是：${reason}。请给他也许两三句温暖的抚慰。`;
     }
-  }
 
-  async generateHealingResponse(emotion: string, subTag?: string): Promise<AIResponse> {
-    try {
-      const responses = {
-        happy: [
-          '继续保持这份快乐的心情！让音乐放大你的幸福感。',
-          '快乐是最好的治愈良药。让这些旋律陪伴你的美好时光。',
-          '你的快乐很有感染力！分享这份美好给身边的人吧。'
-        ],
-        sad: [
-          '悲伤是暂时的，让音乐给你温暖和力量。',
-          '允许自己感受这些情绪，音乐会陪伴你度过这段时光。',
-          '每一片乌云都有银边。让音乐帮你找到那道光。'
-        ],
-        calm: [
-          '享受这份宁静，让心灵得到充分的休息。',
-          '平静是最珍贵的礼物，让音乐加深这份美好。',
-          '在忙碌的世界里找到内心的平和，继续保持。'
-        ],
-        energetic: [
-          '充满能量的你无所不能！让音乐为你的活力加油。',
-          '这份正能量很棒！让它引导你完成想要做的事情。',
-          '你的活力很有感染力，保持这份热情！'
-        ],
-        anxious: [
-          '深呼吸，让音乐帮你缓解内心的不安。',
-          '焦虑是暂时的，音乐会给你平静的力量。',
-          '一步一步来，让音乐引导你回到内心的平和。'
-        ]
-      };
+    const response = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        {
+          role: 'user',
+          content: userPrompt,
+        },
+      ],
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.6,
+      max_tokens: 150,
+      stream: false,
+    });
 
-      const emotionResponses = responses[emotion as keyof typeof responses] || responses.calm;
-      const randomResponse = emotionResponses[Math.floor(Math.random() * emotionResponses.length)];
-
-      return {
-        success: true,
-        message: randomResponse,
-        data: {
-          emotion,
-          subTag,
-          recommendations: ['meditation', 'music', 'breathing']
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: '生成治愈响应失败',
-        error: error instanceof Error ? error.message : '未知错误'
-      };
-    }
-  }
-
-  async chatWithAI(messages: ChatMessage[]): Promise<AIResponse> {
-    try {
-      const lastMessage = messages[messages.length - 1];
-      
-      // 模拟 AI 响应
-      const responses = [
-        '我理解你的感受。你能告诉我更多细节吗？',
-        '这听起来很有趣。让我们一起探索这个问题。',
-        '谢谢你分享这个。你希望我如何帮助你？',
-        '我听到了你的声音。让我们一步步来解决这个问题。',
-        '这是一个很好的问题。让我为你提供一些建议。'
-      ];
-
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-      return {
-        success: true,
-        message: randomResponse,
-        data: {
-          response: randomResponse,
-          timestamp: new Date()
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: 'AI 对话失败',
-        error: error instanceof Error ? error.message : '未知错误'
-      };
-    }
-  }
-
-  async generateMusicRecommendations(emotion: string, preferences?: string[]): Promise<AIResponse> {
-    try {
-      const baseRecommendations = {
-        happy: ['upbeat-piano', 'joyful-melodies', 'positive-vibes'],
-        sad: ['soothing-piano', 'comforting-melodies', 'gentle-harmony'],
-        calm: ['meditation-music', 'peaceful-piano', 'relaxing-sounds'],
-        energetic: ['motivational-music', 'energetic-beats', 'uplifting-melodies'],
-        anxious: ['calming-piano', 'peaceful-sounds', 'stress-relief-music']
-      };
-
-      const recommendations = baseRecommendations[emotion as keyof typeof baseRecommendations] || baseRecommendations.calm;
-
-      return {
-        success: true,
-        message: '音乐推荐生成成功',
-        data: {
-          recommendations,
-          emotion,
-          duration: '30-60分钟'
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: '音乐推荐失败',
-        error: error instanceof Error ? error.message : '未知错误'
-      };
-    }
+    const healingText = response.choices[0]?.message?.content?.trim() || '';
+    
+    return {
+      text: healingText,
+      success: true,
+    };
+  } catch (error) {
+    console.error('Groq API Error:', error);
+    
+    // 返回优雅的降级文案
+    const fallbackTexts = [
+      '深夜的星光，正温柔地注视着你。',
+      '你的感受，如同月光般真实而美好。',
+      '让呼吸带着烦恼，一同缓缓流淌。',
+    ];
+    
+    return {
+      text: fallbackTexts[Math.floor(Math.random() * fallbackTexts.length)],
+      success: false,
+      error: error instanceof Error ? error.message : '未知错误',
+    };
   }
 }
-
-export default new AIService();
