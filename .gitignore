@@ -25,3 +25,9 @@ dist-ssr
 
 # Audio files (should be provided by user)
 public/audio/*.mp3
+
+# Environment and local test artifacts
+.env
+.env.*
+test-api.html
+src/services/aiServiceDirect.ts
