@@ -246,17 +246,17 @@ const FlowBotHome: React.FC = () => {
         <div className="text-center mb-12">
           <div className="tech-card inline-block px-8 py-4 data-stream">
             <div className="tech-font text-4xl mb-2 glow-text">{currentTime}</div>
-            <div className="text-sm text-gray-400 tech-font">SYSTEM TIME</div>
+            <div className="text-sm text-gray-400 tech-font">深夜时光</div>
           </div>
         </div>
 
         {/* 标题 */}
         <div className="text-center mb-16">
           <h1 className="tech-title text-5xl md:text-6xl mb-6">
-            今晚，<span className="font-light text-gray-300">情绪状态</span>？
+            今晚，<span className="font-light text-gray-300">心情如何</span>？
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto tracking-wide">
-            选择最符合您当前情绪状态的模块，系统将为您匹配专属的神经疗愈方案
+            选择最符合你心情的卡片，让我们陪你度过这个夜晚
           </p>
         </div>
 
@@ -318,7 +318,7 @@ const FlowBotHome: React.FC = () => {
           <div className="tech-card inline-block px-6 py-3">
             <p className="text-sm text-gray-400 tech-font tracking-wider animate-pulse">
               <i className="fas fa-hand-pointer mr-2"></i>
-              触碰模块以启动神经疗愈程序
+              点击卡片开始陪伴
             </p>
           </div>
         </div>

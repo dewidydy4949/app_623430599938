@@ -39,14 +39,16 @@ export const AudioManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentTrack, setCurrentTrack] = useState<AudioTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState(0.7);
+  const [volume, setVolumeState] = useState(0.3);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [tracks, setTracks] = useState<AudioTrack[]>([
+
+  // 使用稳定的 Google 官方雨声音频源
+  const [tracks] = useState<AudioTrack[]>([
     {
       id: 'rain-ambient',
       name: '雨声环境音',
-      url: '/audio/rain.mp3', // 优先使用本地文件
+      url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg',
     },
     {
       id: 'soft-piano',
@@ -79,9 +81,11 @@ export const AudioManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (typeof window !== 'undefined') {
       audioRef.current = new Audio();
       audioRef.current.preload = 'auto';
-      
+      // 设置初始音量为 0.3（不要太大声）
+      audioRef.current.volume = 0.3;
+
       const audio = audioRef.current;
-      
+
       const updateTime = () => {
         if (audio.duration) {
           setProgress((audio.currentTime / audio.duration) * 100);
@@ -95,7 +99,6 @@ export const AudioManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       audio.addEventListener('timeupdate', updateTime);
       audio.addEventListener('ended', handleEnded);
-      audio.volume = volume;
 
       return () => {
         audio.removeEventListener('timeupdate', updateTime);
@@ -114,56 +117,38 @@ export const AudioManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const track = tracks.find(t => t.id === trackId);
     if (!track || !audioRef.current) return;
 
-    const attemptPlay = async (url: string, fallbackUrl?: string) => {
-      try {
-        if (currentTrack?.id !== trackId) {
-          audioRef.current!.src = url;
-          setCurrentTrack(track);
-          setProgress(0);
-        }
+    console.log('🎵 播放音频:', track.name, track.url);
 
-        await audioRef.current!.play();
-        setIsPlaying(true);
-        return true;
-      } catch (error) {
-        console.warn(`Failed to play ${url}:`, error);
-        
-        if (fallbackUrl && url.includes('/audio/')) {
-          console.log('Attempting fallback to online resource...');
-          return attemptPlay(fallbackUrl);
-        }
-        
-        console.error('Audio play failed:', error);
-        setIsPlaying(false);
-        return false;
+    try {
+      // 设置音频源
+      audioRef.current.src = track.url;
+      setCurrentTrack(track);
+      setProgress(0);
+
+      // 播放音频
+      const playPromise = audioRef.current.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('✅ 音频播放成功');
+            setIsPlaying(true);
+          })
+          .catch(error => {
+            console.error('❌ 音频播放失败:', error);
+            setIsPlaying(false);
+          });
       }
-    };
-
-    // 为本地音频设置降级URL
-    const fallbackUrls: Record<string, string> = {
-      'rain-ambient': 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg',
-      'soft-piano': 'https://actions.google.com/sounds/v1/ambiences/magical_chime.ogg',
-      'sleep-music': 'https://actions.google.com/sounds/v1/ambiences/overnight_silence.ogg',
-      'nature-sounds': 'https://actions.google.com/sounds/v1/weather/thunder_crack.ogg',
-      'meditation': 'https://actions.google.com/sounds/v1/ambiences/rolling_brook.ogg',
-      'relaxing-nature': 'https://actions.google.com/sounds/v1/weather/wind.ogg'
-    };
-
-    const fallbackUrl = fallbackUrls[trackId];
-    attemptPlay(track.url, fallbackUrl);
+    } catch (error) {
+      console.error('❌ 播放音频时出错:', error);
+      setIsPlaying(false);
+    }
   };
 
-  // 解锁并播放音频 - 用于用户交互触发
+  // 解锁并播放音频 - 简化版
   const unlockAndPlay = async (trackId: string): Promise<boolean> => {
     try {
-      // 首先解锁音频
-      const unlocked = await audioUnlockService.unlockAudio();
-      if (!unlocked) {
-        console.error('Failed to unlock audio');
-        return false;
-      }
-
-      // 然后播放音频
+      // 简化版：直接播放，不依赖 AudioUnlockService
       play(trackId);
       return true;
     } catch (error) {
@@ -172,25 +157,18 @@ export const AudioManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  // 音量渐入播放
+  // 音量渐入播放 - 简化版
   const fadeInPlay = async (trackId: string, duration: number = 2000): Promise<void> => {
     const track = tracks.find(t => t.id === trackId);
     if (!track || !audioRef.current) return;
 
-    if (currentTrack?.id !== trackId) {
+    try {
+      // 直接播放，不使用复杂的渐入逻辑
       audioRef.current.src = track.url;
       setCurrentTrack(track);
       setProgress(0);
-    }
-
-    try {
-      // 开始播放（音量为0）
-      audioRef.current.volume = 0;
       await audioRef.current.play();
       setIsPlaying(true);
-
-      // 渐入音量
-      await audioUnlockService.createFadeIn(audioRef.current, duration);
     } catch (error) {
       console.error('Error in fadeInPlay:', error);
     }

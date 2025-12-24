@@ -96,7 +96,6 @@ const ImmersiveHealingPage: React.FC = () => {
   const [userInput, setUserInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isContentVisible, setIsContentVisible] = useState(false);
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
@@ -104,37 +103,21 @@ const ImmersiveHealingPage: React.FC = () => {
 
   useEffect(() => {
     const originalTitle = document.title;
-    document.title = 'AI 疗愈空间 - 神经连接已建立';
-    
+    document.title = '深夜疗愈空间 - 月光在等你';
+
     setTimeout(() => {
       setIsContentVisible(true);
     }, 1000);
 
-    if (hasUserInteracted) {
-      const playAudioWithDelay = async () => {
-        try {
-          await fadeInPlay(moodInfo.audioTrack, 3000);
-          console.log(`Audio fading in: ${moodInfo.audioTrack}`);
-        } catch (error) {
-          console.error('Audio play failed:', error);
-          setTimeout(() => {
-            play(moodInfo.audioTrack);
-          }, 100);
-        }
-      };
-      
-      setTimeout(playAudioWithDelay, 1000);
-    }
-
-    return () => { 
+    return () => {
       document.title = originalTitle;
       pause();
     };
-  }, [hasUserInteracted, moodInfo.audioTrack, fadeInPlay]);
+  }, [pause]);
 
   useEffect(() => {
     const fetchAndDisplayText = async () => {
-      await typewriterEffect('正在连接神经网络...');
+      await typewriterEffect('正在倾听你的心声...');
       
       try {
         const reason = subTagId ? subTagMapping[subTagId] || '' : '';
@@ -195,12 +178,6 @@ const ImmersiveHealingPage: React.FC = () => {
     }
     
     setIsTyping(false);
-  };
-
-  const handleUserInteraction = () => {
-    if (!hasUserInteracted) {
-      setHasUserInteracted(true);
-    }
   };
 
   const handleBackToMoods = () => {
@@ -270,35 +247,29 @@ const ImmersiveHealingPage: React.FC = () => {
         if (response.success) {
           await typewriterEffect(response.text);
         } else {
-          await typewriterEffect('神经网络正在处理您的情绪数据...');
+          await typewriterEffect('星星正在眨眼...');
         }
       } catch (error) {
         console.error('Failed to fetch healing response:', error);
-        await typewriterEffect('神经网络正在处理您的情绪数据...');
+        await typewriterEffect('星星正在眨眼...');
       }
     }
   };
 
   const handleAudioToggle = () => {
-    if (!hasUserInteracted) {
-      setHasUserInteracted(true);
-      // 首次点击会触发useEffect中的播放逻辑
-      return;
-    }
+    console.log('🎧 音频按钮被点击, isPlaying:', isPlaying);
 
     if (isPlaying) {
+      console.log('⏸️ 暂停播放');
       pause();
     } else {
+      console.log('▶️ 开始播放');
       play(moodInfo.audioTrack);
     }
   };
 
   return (
-    <div 
-      className="min-h-screen relative overflow-hidden"
-      onClick={handleUserInteraction}
-      onTouchStart={handleUserInteraction}
-    >
+    <div className="min-h-screen relative overflow-hidden">
       {/* 高科技动态背景 */}
       <DynamicBackground emotion={moodId} interactive={true} />
       
@@ -323,11 +294,10 @@ const ImmersiveHealingPage: React.FC = () => {
           e.stopPropagation();
           handleAudioToggle();
         }}
-        className={`fixed top-24 right-8 z-50 w-14 h-14 tech-card flex items-center justify-center group transition-all duration-300 hover:scale-110 ${isPlaying ? 'glow-border' : ''} ${!hasUserInteracted ? 'animate-pulse' : ''}`}
+        className={`fixed top-24 right-8 z-50 w-14 h-14 tech-card flex items-center justify-center group transition-all duration-300 hover:scale-110 ${isPlaying ? 'glow-border' : ''}`}
         aria-label={isPlaying ? '暂停' : '播放'}
       >
-        <i className={`fas text-lg ${!hasUserInteracted ? 'fa-play text-blue-400' : (isPlaying ? 'fa-pause text-green-400' : 'fa-play text-blue-400')} group-hover:scale-110 transition-all`}></i>
-        {!hasUserInteracted && <span className="absolute -bottom-8 text-xs text-gray-400 tech-font whitespace-nowrap">点击播放</span>}
+        <i className={`fas text-lg ${isPlaying ? 'fa-pause text-green-400' : 'fa-play text-blue-400'} group-hover:scale-110 transition-all`}></i>
       </button>
 
       {/* 返回按钮 */}
@@ -356,7 +326,7 @@ const ImmersiveHealingPage: React.FC = () => {
                 {moodInfo.title}
               </h1>
               <div className="tech-font text-sm text-gray-400 tracking-wider uppercase">
-                Neural Healing Protocol Active
+                深夜疗愈时刻
               </div>
             </div>
           </div>
@@ -365,7 +335,7 @@ const ImmersiveHealingPage: React.FC = () => {
           <div className="tech-card p-10 mb-12 relative">
             <div className="absolute top-4 right-4 flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-xs tech-font text-green-400">AI Processing</span>
+              <span className="text-xs tech-font text-green-400">正在倾听</span>
             </div>
             
             <div className="relative z-10">
@@ -396,8 +366,8 @@ const ImmersiveHealingPage: React.FC = () => {
                 onClick={() => setShowInputOption(true)}
                 className="tech-button group"
               >
-                <i className="fas fa-microchip mr-2 group-hover:animate-pulse"></i>
-                启动神经对话接口
+                <i className="fas fa-comment-dots mr-2 group-hover:animate-pulse"></i>
+                我想和你聊聊
               </button>
             ) : (
               <div className="tech-card p-6 max-w-2xl mx-auto">
@@ -405,7 +375,7 @@ const ImmersiveHealingPage: React.FC = () => {
                   <textarea
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    placeholder="输入您的想法... 神经网络将为您提供深度分析..."
+                    placeholder="告诉我你的想法..."
                     className="tech-input min-h-[120px] resize-none pr-12"
                     maxLength={300}
                     autoFocus
@@ -444,7 +414,7 @@ const ImmersiveHealingPage: React.FC = () => {
                     className="tech-button disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <i className="fas fa-paper-plane mr-2"></i>
-                    发送神经信号
+                    发送
                   </button>
                 </div>
               </div>

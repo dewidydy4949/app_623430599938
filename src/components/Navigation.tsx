@@ -43,8 +43,8 @@ export const Navigation: React.FC<NavigationProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl opacity-0 group-hover:opacity-20 blur transition-all duration-500"></div>
               </div>
               <div>
-                <h1 className="tech-title text-xl">AI 疗愈系统</h1>
-                <p className="text-xs text-gray-400 tracking-wider">NEURAL HEALING v2.0</p>
+                <h1 className="tech-title text-xl">深夜疗愈空间</h1>
+                <p className="text-xs text-gray-400 tracking-wider">温暖陪伴</p>
               </div>
             </div>
           </div>
@@ -214,7 +214,7 @@ export const Navigation: React.FC<NavigationProps> = ({
               <span className="text-xs tech-font text-green-400">系统在线</span>
             </div>
             <div className="text-xs text-gray-500 tech-font">
-              {!isSidebarCollapsed ? 'Neural Network Active' : 'NN Active'}
+              {!isSidebarCollapsed ? '陪伴模式已开启' : '陪伴中'}
             </div>
           </div>
         </div>

@@ -83,6 +83,22 @@ export async function fetchHealingText({ mood, reason, userInput }: HealingTextR
     let userPrompt: string;
     let systemPrompt: string;
 
+    // 检查 API Key 是否存在
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
+    if (!apiKey) {
+      console.error('❌ Groq API Key 未配置！请在 .env 文件中设置 VITE_GROQ_API_KEY');
+      return {
+        text: '网络有点拥挤，请重试',
+        success: false,
+        error: 'API Key 未配置',
+      };
+    }
+
+    console.log('🌟 正在调用 Groq API...');
+    console.log('📝 Mood:', mood);
+    console.log('📝 Reason:', reason);
+    console.log('📝 User Input:', userInput);
+
     if (userInput && userInput.trim()) {
       // 用户有自定义输入，使用专门的系统提示词
       systemPrompt = SYSTEM_PROMPT_USER_INPUT;
@@ -92,6 +108,9 @@ export async function fetchHealingText({ mood, reason, userInput }: HealingTextR
       systemPrompt = SYSTEM_PROMPT_BASE;
       userPrompt = `用户此刻的心情是"${mood}"，具体感受是"${reason}"。请用你最温暖、包容的语言进行情绪确认，给予情感陪伴，150字左右。`;
     }
+
+    console.log('🔍 系统提示词长度:', systemPrompt.length);
+    console.log('🔍 用户提示词长度:', userPrompt.length);
 
     const response = await groq.chat.completions.create({
       messages: [
@@ -110,22 +129,32 @@ export async function fetchHealingText({ mood, reason, userInput }: HealingTextR
       stream: false,
     });
 
+    console.log('✅ Groq API 响应成功！');
+    console.log('📊 响应数据:', JSON.stringify(response, null, 2));
+
     const healingText = response.choices[0]?.message?.content?.trim() || '';
-    
+    console.log('💬 生成的疗愈文本:', healingText);
+
     return {
       text: healingText,
       success: true,
     };
-  } catch (error) {
-    console.error('Groq API Error:', error);
-    
+  } catch (error: any) {
+    console.error('❌ Groq API 错误详情:', error);
+    console.error('❌ 错误类型:', error.constructor.name);
+    console.error('❌ 错误消息:', error.message);
+    if (error.response) {
+      console.error('❌ API 响应状态:', error.response.status);
+      console.error('❌ API 响应数据:', error.response.data);
+    }
+
     // 返回优雅的降级文案
     const fallbackTexts = [
       '深夜的星光，正温柔地注视着你。',
       '你的感受，如同月光般真实而美好。',
       '让呼吸带着烦恼，一同缓缓流淌。',
     ];
-    
+
     return {
       text: fallbackTexts[Math.floor(Math.random() * fallbackTexts.length)],
       success: false,

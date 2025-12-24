@@ -468,8 +468,8 @@ const LoginPage: React.FC = () => {
             <a href="#" className="hover:text-blue-400 transition-all duration-300 hover:scale-110 inline-block">技术支持</a>
           </div>
           <div className="text-xs text-gray-500 space-y-1">
-            <p>© 2024 AI 情绪疗愈师. All rights reserved.</p>
-            <p>Powered by Advanced Neural Networks</p>
+            <p>© 2024 深夜疗愈空间. All rights reserved.</p>
+            <p>陪伴每一个需要温暖的夜晚</p>
           </div>
         </div>
       </div>
