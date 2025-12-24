@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './styles.module.css';
 import { useAudioManager } from '../../audio/AudioManager';
@@ -97,6 +97,8 @@ const ImmersiveHealingPage: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isContentVisible, setIsContentVisible] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const moodInfo = moodConfig[moodId] || moodConfig.overthinking;
 
@@ -136,23 +138,47 @@ const ImmersiveHealingPage: React.FC = () => {
       
       try {
         const reason = subTagId ? subTagMapping[subTagId] || '' : '';
-        const response: HealingTextResponse = await fetchHealingText({
+        
+        // 使用Promise.race实现超时控制（8秒超时）
+        const timeoutPromise = new Promise<{ success: false; error: string }>((_, reject) => {
+          setTimeout(() => reject(new Error('Request timeout after 8 seconds')), 8000);
+        });
+        
+        const apiPromise = fetchHealingText({
           mood: moodId,
           reason: reason,
         });
         
+        const response = await Promise.race([apiPromise, timeoutPromise]) as HealingTextResponse;
+        
+        console.log('API Response:', JSON.stringify(response, null, 2));
+        
         await new Promise(resolve => setTimeout(resolve, 500));
         setDisplayedText('');
         
-        if (response.success) {
+        if (response.success && response.text && response.text.trim()) {
           await typewriterEffect(response.text);
         } else {
-          await typewriterEffect('星空正在接收您的情绪信号，请稍候...');
+          // 降级文案
+          const fallbackTexts = [
+            '星空太安静了，但我在这里陪着你...',
+            '今晚的月色很温柔，就像我对你的陪伴。',
+            '让所有的思绪都随着星光慢慢消散吧。',
+            '在这个安静的夜晚，你不是一个人。',
+            '把烦恼交给星空，把美好留给自己。',
+          ];
+          await typewriterEffect(fallbackTexts[Math.floor(Math.random() * fallbackTexts.length)]);
         }
       } catch (error) {
         console.error('Failed to fetch healing text:', error);
         setDisplayedText('');
-        await typewriterEffect('星空正在接收您的情绪信号，请稍候...');
+        // 错误降级文案
+        const errorFallbackTexts = [
+          '星空太安静了，但我在这里陪着你...',
+          '今晚的月色很温柔，就像我对你的陪伴。',
+          '把烦恼交给星空，把美好留给自己。',
+        ];
+        await typewriterEffect(errorFallbackTexts[Math.floor(Math.random() * errorFallbackTexts.length)]);
       }
     };
 
@@ -179,6 +205,49 @@ const ImmersiveHealingPage: React.FC = () => {
 
   const handleBackToMoods = () => {
     navigate('/home');
+  };
+
+  // 语音识别初始化
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'zh-CN';
+
+        recognition.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setUserInput(prev => prev + (prev ? ' ' : '') + transcript);
+          setIsListening(false);
+        };
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      }
+    }
+  }, []);
+
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+    }
   };
 
   const handleSubmitInput = async () => {
@@ -210,6 +279,20 @@ const ImmersiveHealingPage: React.FC = () => {
     }
   };
 
+  const handleAudioToggle = () => {
+    if (!hasUserInteracted) {
+      setHasUserInteracted(true);
+      // 首次点击会触发useEffect中的播放逻辑
+      return;
+    }
+
+    if (isPlaying) {
+      pause();
+    } else {
+      play(moodInfo.audioTrack);
+    }
+  };
+
   return (
     <div 
       className="min-h-screen relative overflow-hidden"
@@ -238,13 +321,13 @@ const ImmersiveHealingPage: React.FC = () => {
       <button
         onClick={(e) => {
           e.stopPropagation();
-          toggleMute();
+          handleAudioToggle();
         }}
         className={`fixed top-24 right-8 z-50 w-14 h-14 tech-card flex items-center justify-center group transition-all duration-300 hover:scale-110 ${isPlaying ? 'glow-border' : ''} ${!hasUserInteracted ? 'animate-pulse' : ''}`}
-        aria-label={isMuted ? '开启声音' : '静音'}
+        aria-label={isPlaying ? '暂停' : '播放'}
       >
-        <i className={`fas text-lg ${isMuted || !isPlaying ? 'fa-volume-mute text-red-400' : 'fa-volume-up text-green-400'} group-hover:scale-110 transition-all`}></i>
-        {!hasUserInteracted && <span className="absolute -bottom-8 text-xs text-gray-400 tech-font whitespace-nowrap">点击激活音频</span>}
+        <i className={`fas text-lg ${!hasUserInteracted ? 'fa-play text-blue-400' : (isPlaying ? 'fa-pause text-green-400' : 'fa-play text-blue-400')} group-hover:scale-110 transition-all`}></i>
+        {!hasUserInteracted && <span className="absolute -bottom-8 text-xs text-gray-400 tech-font whitespace-nowrap">点击播放</span>}
       </button>
 
       {/* 返回按钮 */}
@@ -318,14 +401,32 @@ const ImmersiveHealingPage: React.FC = () => {
               </button>
             ) : (
               <div className="tech-card p-6 max-w-2xl mx-auto">
-                <textarea
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="输入您的想法... 神经网络将为您提供深度分析..."
-                  className="tech-input min-h-[120px] resize-none mb-4"
-                  maxLength={300}
-                  autoFocus
-                />
+                <div className="relative mb-4">
+                  <textarea
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    placeholder="输入您的想法... 神经网络将为您提供深度分析..."
+                    className="tech-input min-h-[120px] resize-none pr-12"
+                    maxLength={300}
+                    autoFocus
+                  />
+                  {/* 语音输入按钮 */}
+                  <button
+                    onMouseDown={startListening}
+                    onMouseUp={stopListening}
+                    onMouseLeave={stopListening}
+                    onTouchStart={(e) => { e.preventDefault(); startListening(); }}
+                    onTouchEnd={(e) => { e.preventDefault(); stopListening(); }}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isListening 
+                        ? 'bg-red-500/20 text-red-400 animate-pulse scale-110' 
+                        : 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 hover:scale-110'
+                    }`}
+                    title="按住说话"
+                  >
+                    <i className={`fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'} text-sm`}></i>
+                  </button>
+                </div>
                 <div className="flex justify-center space-x-4">
                   <button
                     onClick={() => {
