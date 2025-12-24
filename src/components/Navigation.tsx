@@ -27,147 +27,197 @@ export const Navigation: React.FC<NavigationProps> = ({
   return (
     <>
       {/* 顶部导航栏 */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-card-bg border-b-2 border-primary/20 z-50 backdrop-blur-lg shadow-md">
-        <div className="flex items-center justify-between h-full px-8">
+      <header className="fixed top-0 left-0 right-0 h-18 tech-card z-50">
+        <div className="flex items-center justify-between h-full px-6">
           {/* 左侧：Logo和产品名称 */}
           <div className="flex items-center space-x-4">
             <button 
               onClick={onSidebarToggle}
-              className="p-2 rounded-lg hover:bg-gradient-to-r hover:from-primary/10 hover:to-secondary/10 transition-all group"
+              className="p-3 rounded-xl hover:bg-white/10 transition-all group data-stream"
             >
-              <i className="fas fa-bars text-primary group-hover:scale-110 transition-transform"></i>
+              <i className="fas fa-bars text-blue-400 group-hover:text-purple-400 group-hover:scale-110 transition-all"></i>
             </button>
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary via-secondary to-tertiary rounded-xl flex items-center justify-center shadow-lg border-2 border-white/30">
-                <i className="fas fa-moon text-white text-base"></i>
+              <div className="relative w-12 h-12 tech-card flex items-center justify-center group cursor-pointer">
+                <i className="fas fa-brain text-2xl text-blue-400 group-hover:text-purple-400 group-hover:animate-pulse"></i>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl opacity-0 group-hover:opacity-20 blur transition-all duration-500"></div>
               </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-tight">情绪疗愈哄睡师</h1>
+              <div>
+                <h1 className="tech-title text-xl">AI 疗愈系统</h1>
+                <p className="text-xs text-gray-400 tracking-wider">NEURAL HEALING v2.0</p>
+              </div>
             </div>
           </div>
           
           {/* 中间：搜索框 */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
             <div className="relative w-full">
               <input 
                 type="text" 
-                placeholder="搜索历史记录..." 
+                placeholder="搜索历史记录、疗愈方案..." 
                 value={globalSearchKeyword}
                 onChange={(e) => onSearchChange?.(e.target.value)}
                 onKeyPress={onGlobalSearch}
-                className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary border-2 border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all text-sm"
+                className="tech-input pr-12 tech-font text-sm"
               />
-              <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-primary"></i>
+              <i className="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-purple-400"></i>
+              <div className="absolute inset-0 data-stream opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
             </div>
           </div>
           
           {/* 右侧：通知和用户头像 */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <button 
               onClick={onNotificationClick}
-              className="relative p-2 rounded-lg hover:bg-gradient-to-r hover:from-warning/10 hover:to-accent/10 transition-all group"
+              className="relative p-3 rounded-xl hover:bg-white/10 transition-all group tech-card"
             >
-              <i className="fas fa-bell text-warning group-hover:scale-110 transition-transform"></i>
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-danger to-warning rounded-full border border-white"></span>
+              <i className="fas fa-bell text-orange-400 group-hover:text-yellow-400 group-hover:scale-110 transition-all"></i>
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full border-2 border-gray-900 animate-pulse"></span>
             </button>
             <div className="relative">
               <button 
                 onClick={onUserAvatarClick}
-                className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gradient-to-r hover:from-primary/10 hover:to-secondary/10 transition-all group border-2 border-transparent hover:border-primary/30"
+                className="flex items-center space-x-3 p-2 rounded-xl hover:bg-white/10 transition-all group tech-card"
               >
-                <img 
-                  src="https://s.coze.cn/image/FFIG_zbIRLw/" 
-                  alt="用户头像" 
-                  className="w-8 h-8 rounded-full object-cover border-2 border-primary/30 group-hover:border-primary/60 transition-all"
-                />
-                <span className="hidden md:block text-sm font-semibold text-primary">小雨</span>
-                <i className="fas fa-chevron-down text-xs text-primary"></i>
+                <div className="relative">
+                  <img 
+                    src="https://s.coze.cn/image/FFIG_zbIRLw/" 
+                    alt="用户头像" 
+                    className="w-9 h-9 rounded-full object-cover border-2 border-blue-400/50 group-hover:border-purple-400/50 transition-all"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-gray-900 animate-pulse"></div>
+                </div>
+                <span className="hidden md:block text-sm font-medium text-gray-300 group-hover:text-white transition-colors">用户_001</span>
+                <i className="fas fa-chevron-down text-xs text-gray-400 group-hover:text-white transition-colors"></i>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* 左侧菜单 */}
-      <aside className={`fixed left-0 top-16 bottom-0 bg-card-bg border-r-2 border-primary/20 z-40 ${isSidebarCollapsed ? 'w-16' : 'w-56'} transition-all duration-300`}>
-        <nav className="p-3 space-y-1">
+      {/* 左侧导航 */}
+      <aside className={`fixed left-0 top-18 bottom-0 tech-card z-40 transition-all duration-500 ${isSidebarCollapsed ? 'w-20' : 'w-64'} border-r border-white/10`}>
+        <nav className="p-4 space-y-2">
           <Link 
             to="/home" 
-            className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-bold shadow-md ${
+            className={`flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 text-sm font-medium relative overflow-hidden group ${
               isActive('/home') || isActive('/')
-                ? 'bg-gradient-to-r from-primary via-secondary to-tertiary text-white border-2 border-white/30'
-                : 'bg-gradient-to-r from-primary/20 to-secondary/20 text-primary border-2 border-primary/30 hover:from-primary/30 hover:to-secondary/30 hover:border-primary/50'
+                ? 'tech-card text-white glow-border'
+                : 'hover:bg-white/10 text-gray-300 hover:text-white'
             }`}
           >
-            <i className="fas fa-home text-base"></i>
-            {!isSidebarCollapsed && <span>首页</span>}
+            <div className="relative z-10 flex items-center space-x-4">
+              <i className="fas fa-home text-lg text-blue-400 group-hover:text-purple-400 transition-colors"></i>
+              {!isSidebarCollapsed && <span className="tech-font tracking-wide">控制台</span>}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
+          
           <Link 
             to="/emotion-select" 
-            className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-bold shadow-md ${
+            className={`flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 text-sm font-medium relative overflow-hidden group ${
               isActive('/emotion-select')
-                ? 'bg-gradient-to-r from-primary via-secondary to-tertiary text-white border-2 border-white/30'
-                : 'bg-gradient-to-r from-primary/20 to-secondary/20 text-primary border-2 border-primary/30 hover:from-primary/30 hover:to-secondary/30 hover:border-primary/50 group'
+                ? 'tech-card text-white glow-border'
+                : 'hover:bg-white/10 text-gray-300 hover:text-white'
             }`}
           >
-            <i className="fas fa-heart text-base group-hover:scale-110 group-hover:rotate-12 transition-all"></i>
-            {!isSidebarCollapsed && <span>情绪选择</span>}
+            <div className="relative z-10 flex items-center space-x-4">
+              <i className="fas fa-heart text-lg text-pink-400 group-hover:text-red-400 transition-colors group-hover:scale-110"></i>
+              {!isSidebarCollapsed && <span className="tech-font tracking-wide">情绪分析</span>}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-600/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
+          
           <Link 
             to="/history" 
-            className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-bold shadow-md ${
+            className={`flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 text-sm font-medium relative overflow-hidden group ${
               isActive('/history')
-                ? 'bg-gradient-to-r from-primary via-secondary to-tertiary text-white border-2 border-white/30'
-                : 'bg-gradient-to-r from-secondary/20 to-tertiary/20 text-secondary border-2 border-secondary/30 hover:from-secondary/30 hover:to-tertiary/30 hover:border-secondary/50 group'
+                ? 'tech-card text-white glow-border'
+                : 'hover:bg-white/10 text-gray-300 hover:text-white'
             }`}
           >
-            <i className="fas fa-history text-base group-hover:scale-110 group-hover:rotate-12 transition-all"></i>
-            {!isSidebarCollapsed && <span>历史记录</span>}
+            <div className="relative z-10 flex items-center space-x-4">
+              <i className="fas fa-history text-lg text-cyan-400 group-hover:text-blue-400 transition-colors group-hover:scale-110"></i>
+              {!isSidebarCollapsed && <span className="tech-font tracking-wide">疗愈记录</span>}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
+          
           <Link 
             to="/collection" 
-            className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-bold shadow-md ${
+            className={`flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 text-sm font-medium relative overflow-hidden group ${
               isActive('/collection')
-                ? 'bg-gradient-to-r from-primary via-secondary to-tertiary text-white border-2 border-white/30'
-                : 'bg-gradient-to-r from-primary/20 to-secondary/20 text-primary border-2 border-primary/30 hover:from-primary/30 hover:to-secondary/30 hover:border-primary/50 group'
+                ? 'tech-card text-white glow-border'
+                : 'hover:bg-white/10 text-gray-300 hover:text-white'
             }`}
           >
-            <i className="fas fa-bookmark text-base group-hover:scale-110 group-hover:rotate-12 transition-all"></i>
-            {!isSidebarCollapsed && <span>我的收藏</span>}
+            <div className="relative z-10 flex items-center space-x-4">
+              <i className="fas fa-bookmark text-lg text-green-400 group-hover:text-emerald-400 transition-colors group-hover:scale-110"></i>
+              {!isSidebarCollapsed && <span className="tech-font tracking-wide">收藏夹</span>}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-green-600/20 to-emerald-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
+          
+          <div className="tech-divider my-4"></div>
+          
           <Link 
             to="/settings" 
-            className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-bold shadow-md ${
+            className={`flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 text-sm font-medium relative overflow-hidden group ${
               isActive('/settings')
-                ? 'bg-gradient-to-r from-primary via-secondary to-tertiary text-white border-2 border-white/30'
-                : 'bg-gradient-to-r from-accent/20 to-warning/20 text-accent border-2 border-accent/30 hover:from-accent/30 hover:to-warning/30 hover:border-accent/50 group'
+                ? 'tech-card text-white glow-border'
+                : 'hover:bg-white/10 text-gray-300 hover:text-white'
             }`}
           >
-            <i className="fas fa-cog text-base group-hover:scale-110 group-hover:rotate-12 transition-all"></i>
-            {!isSidebarCollapsed && <span>设置</span>}
+            <div className="relative z-10 flex items-center space-x-4">
+              <i className="fas fa-cog text-lg text-orange-400 group-hover:text-amber-400 transition-colors group-hover:rotate-90"></i>
+              {!isSidebarCollapsed && <span className="tech-font tracking-wide">系统设置</span>}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 to-amber-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
+          
           <Link 
             to="/feedback" 
-            className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-bold shadow-md ${
+            className={`flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 text-sm font-medium relative overflow-hidden group ${
               isActive('/feedback')
-                ? 'bg-gradient-to-r from-warning via-accent to-danger text-white border-2 border-white/30'
-                : 'bg-gradient-to-r from-warning/20 to-accent/20 text-warning border-2 border-warning/30 hover:from-warning/30 hover:to-accent/30 hover:border-warning/50 group'
+                ? 'tech-card text-white glow-border'
+                : 'hover:bg-white/10 text-gray-300 hover:text-white'
             }`}
           >
-            <i className="fas fa-comment-dots text-base group-hover:scale-110 group-hover:rotate-12 transition-all"></i>
-            {!isSidebarCollapsed && <span>反馈建议</span>}
+            <div className="relative z-10 flex items-center space-x-4">
+              <i className="fas fa-comment-dots text-lg text-yellow-400 group-hover:text-lime-400 transition-colors group-hover:scale-110"></i>
+              {!isSidebarCollapsed && <span className="tech-font tracking-wide">反馈建议</span>}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/20 to-lime-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
+          
           <Link 
             to="/help" 
-            className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-sm font-bold shadow-md ${
+            className={`flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-300 text-sm font-medium relative overflow-hidden group ${
               isActive('/help')
-                ? 'bg-gradient-to-r from-primary via-secondary to-tertiary text-white border-2 border-white/30'
-                : 'bg-gradient-to-r from-tertiary/20 to-accent/20 text-tertiary border-2 border-tertiary/30 hover:from-tertiary/30 hover:to-accent/30 hover:border-tertiary/50 group'
+                ? 'tech-card text-white glow-border'
+                : 'hover:bg-white/10 text-gray-300 hover:text-white'
             }`}
           >
-            <i className="fas fa-question-circle text-base group-hover:scale-110 group-hover:rotate-12 transition-all"></i>
-            {!isSidebarCollapsed && <span>帮助中心</span>}
+            <div className="relative z-10 flex items-center space-x-4">
+              <i className="fas fa-question-circle text-lg text-purple-400 group-hover:text-indigo-400 transition-colors group-hover:scale-110"></i>
+              {!isSidebarCollapsed && <span className="tech-font tracking-wide">帮助中心</span>}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
         </nav>
+        
+        {/* 底部状态指示器 */}
+        <div className="absolute bottom-4 left-4 right-4">
+          <div className="tech-card p-3 text-center">
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs tech-font text-green-400">系统在线</span>
+            </div>
+            <div className="text-xs text-gray-500 tech-font">
+              {!isSidebarCollapsed ? 'Neural Network Active' : 'NN Active'}
+            </div>
+          </div>
+        </div>
       </aside>
     </>
   );

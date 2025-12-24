@@ -3,8 +3,48 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './styles.module.css';
 import { useAudioManager } from '../../audio/AudioManager';
 import { fetchHealingText, HealingTextResponse } from '../../services/aiService';
+import DynamicBackground from '../../components/DynamicBackground';
 
-// 心情配置
+// 子标签映射表
+const subTagMapping: Record<string, string> = {
+  'work-stress': '工作/学业压力',
+  'replaying-moments': '反复回想囧事',
+  'future-worry': '担忧未来',
+  'random-thoughts': '停不下来的胡思乱想',
+  'overanalysis': '过度分析细节',
+  'decision-paralysis': '选择困难',
+  'breakup': '分手失恋',
+  'loneliness': '感到孤单',
+  'betrayal': '被背叛伤害',
+  'missing-someone': '想念某人',
+  'unrequited': '单恋苦涩',
+  'friendship-hurt': '友情伤害',
+  'anxious-sleep': '焦虑性失眠',
+  'irregular-schedule': '作息紊乱',
+  'screen-addiction': '睡前刷手机',
+  'nightmare': '噩梦困扰',
+  'early-awake': '凌晨早醒',
+  'racing-mind': '思绪奔涌难眠',
+  'no-reason': '莫名的忧伤',
+  'weather-influence': '天气影响心情',
+  'hormonal': '荷尔蒙波动',
+  'past-memories': '触景生情',
+  'disappointed': '感到失望',
+  'empty-feeling': '内心空洞',
+  'social-anxiety': '社交恐惧',
+  'performance-pressure': '表现压力',
+  'health-worry': '健康焦虑',
+  'financial-stress': '经济压力',
+  'panic-attack': '恐慌发作',
+  'overwhelmed': '感到不知所措',
+  'physical-fatigue': '身体疲惫',
+  'mental-burnout': '精神倦怠',
+  'emotional-drain': '情绪耗竭',
+  'overworked': '过度劳累',
+  'lack-rest': '缺乏休息',
+  'chronic-tired': '慢性疲劳'
+};
+
 const moodConfig: Record<string, { title: string; emoji: string; bgVideo: string; audioTrack: string }> = {
   overthinking: {
     title: '让思绪缓缓流淌',
@@ -47,9 +87,10 @@ const moodConfig: Record<string, { title: string; emoji: string; bgVideo: string
 const ImmersiveHealingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { play, pause, isPlaying, isMuted, toggleMute } = useAudioManager();
+  const { play, pause, isPlaying, isMuted, toggleMute, fadeInPlay } = useAudioManager();
   
   const [moodId] = useState(searchParams.get('mood') || 'overthinking');
+  const [subTagId] = useState(searchParams.get('subTag') || '');
   const [displayedText, setDisplayedText] = useState('');
   const [showInputOption, setShowInputOption] = useState(false);
   const [userInput, setUserInput] = useState('');
@@ -61,67 +102,70 @@ const ImmersiveHealingPage: React.FC = () => {
 
   useEffect(() => {
     const originalTitle = document.title;
-    document.title = '疗愈空间 - 正在为你温柔陪伴';
+    document.title = 'AI 疗愈空间 - 神经连接已建立';
     
-    // 延迟显示内容，营造沉浸感
     setTimeout(() => {
       setIsContentVisible(true);
     }, 1000);
 
-    // 等待用户交互后播放音乐
     if (hasUserInteracted) {
       const playAudioWithDelay = async () => {
         try {
-          await play(moodInfo.audioTrack);
+          await fadeInPlay(moodInfo.audioTrack, 3000);
+          console.log(`Audio fading in: ${moodInfo.audioTrack}`);
         } catch (error) {
           console.error('Audio play failed:', error);
-          // 如果播放失败，静音后重试
           setTimeout(() => {
             play(moodInfo.audioTrack);
           }, 100);
         }
       };
       
-      setTimeout(playAudioWithDelay, 500);
+      setTimeout(playAudioWithDelay, 1000);
     }
 
     return () => { 
       document.title = originalTitle;
-      pause(); // 页面离开时停止音乐
+      pause();
     };
-  }, [hasUserInteracted, moodInfo.audioTrack]);
+  }, [hasUserInteracted, moodInfo.audioTrack, fadeInPlay]);
 
-  // AI 文案获取和打字机效果
   useEffect(() => {
     const fetchAndDisplayText = async () => {
+      await typewriterEffect('正在连接神经网络...');
+      
       try {
+        const reason = subTagId ? subTagMapping[subTagId] || '' : '';
         const response: HealingTextResponse = await fetchHealingText({
           mood: moodId,
-          reason: '',
+          reason: reason,
         });
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setDisplayedText('');
         
         if (response.success) {
           await typewriterEffect(response.text);
         } else {
-          await typewriterEffect('深夜的星光，正温柔地注视着你。');
+          await typewriterEffect('星空正在接收您的情绪信号，请稍候...');
         }
       } catch (error) {
         console.error('Failed to fetch healing text:', error);
-        await typewriterEffect('深夜的星光，正温柔地注视着你。');
+        setDisplayedText('');
+        await typewriterEffect('星空正在接收您的情绪信号，请稍候...');
       }
     };
 
     fetchAndDisplayText();
-  }, [moodId]);
+  }, [moodId, subTagId]);
 
-  // 打字机效果
   const typewriterEffect = async (text: string) => {
     setIsTyping(true);
     setDisplayedText('');
     
     for (let i = 0; i <= text.length; i++) {
       setDisplayedText(text.substring(0, i));
-      await new Promise(resolve => setTimeout(resolve, 60)); // 60ms per character
+      await new Promise(resolve => setTimeout(resolve, 60));
     }
     
     setIsTyping(false);
@@ -147,36 +191,47 @@ const ImmersiveHealingPage: React.FC = () => {
       setIsTyping(false);
 
       try {
+        const reason = subTagId ? subTagMapping[subTagId] || '' : '';
         const response: HealingTextResponse = await fetchHealingText({
           mood: moodId,
-          reason: '',
+          reason: reason,
           userInput: inputText,
         });
         
         if (response.success) {
           await typewriterEffect(response.text);
         } else {
-          await typewriterEffect('谢谢你分享这些，我在这里静静地陪伴着你。');
+          await typewriterEffect('神经网络正在处理您的情绪数据...');
         }
       } catch (error) {
         console.error('Failed to fetch healing response:', error);
-        await typewriterEffect('谢谢你分享这些，我在这里静静地陪伴着你。');
-      } finally {
-        // 清理完成
+        await typewriterEffect('神经网络正在处理您的情绪数据...');
       }
     }
   };
 
   return (
     <div 
-      className={`${styles.immersiveHealing} min-h-screen relative overflow-hidden`}
+      className="min-h-screen relative overflow-hidden"
       onClick={handleUserInteraction}
       onTouchStart={handleUserInteraction}
     >
-      {/* 背景视频/图片 */}
-      <div className={styles.backgroundContainer}>
-        <div className={`${styles.backgroundOverlay} ${styles[`bg-${moodInfo.bgVideo}`]}`} />
-        <div className={styles.vignette} />
+      {/* 高科技动态背景 */}
+      <DynamicBackground emotion={moodId} interactive={true} />
+      
+      {/* 粒子效果层 */}
+      <div className="particle-container">
+        {[...Array(60)].map((_, i) => (
+          <div 
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${10 + Math.random() * 8}s`
+            }}
+          />
+        ))}
       </div>
 
       {/* 音频控制按钮 */}
@@ -185,78 +240,110 @@ const ImmersiveHealingPage: React.FC = () => {
           e.stopPropagation();
           toggleMute();
         }}
-        className={`${styles.audioButton} ${isPlaying ? styles.active : ''} ${!hasUserInteracted ? styles.pulse : ''}`}
+        className={`fixed top-24 right-8 z-50 w-14 h-14 tech-card flex items-center justify-center group transition-all duration-300 hover:scale-110 ${isPlaying ? 'glow-border' : ''} ${!hasUserInteracted ? 'animate-pulse' : ''}`}
         aria-label={isMuted ? '开启声音' : '静音'}
       >
-        <i className={`fas ${isMuted || !isPlaying ? 'fa-volume-mute' : 'fa-volume-up'}`}></i>
-        {!hasUserInteracted && <span className={styles.audioHint}>点击开启声音</span>}
+        <i className={`fas text-lg ${isMuted || !isPlaying ? 'fa-volume-mute text-red-400' : 'fa-volume-up text-green-400'} group-hover:scale-110 transition-all`}></i>
+        {!hasUserInteracted && <span className="absolute -bottom-8 text-xs text-gray-400 tech-font whitespace-nowrap">点击激活音频</span>}
       </button>
 
       {/* 返回按钮 */}
       <button
         onClick={handleBackToMoods}
-        className={styles.backButton}
+        className="fixed top-24 left-8 z-50 w-12 h-12 tech-card flex items-center justify-center group transition-all duration-300 hover:scale-110"
         aria-label="返回心情选择"
       >
-        <i className="fas fa-times"></i>
+        <i className="fas fa-arrow-left text-blue-400 group-hover:text-purple-400 group-hover:scale-110 transition-all"></i>
       </button>
 
       {/* 主内容区域 */}
-      <main className={styles.mainContent}>
-        <div className={`max-w-4xl mx-auto px-6 py-12 text-center ${isContentVisible ? styles.visible : ''}`}>
-          {/* 心情标题 */}
-          <div className={`${styles.moodHeader} mb-16`}>
-            <div className="text-6xl mb-4 animate-pulse">{moodInfo.emoji}</div>
-            <h1 className="text-4xl md:text-5xl font-light text-white mb-2 leading-tight">
-              {moodInfo.title}
-            </h1>
+      <main className="relative z-10 flex items-center justify-center min-h-screen px-6">
+        <div className={`max-w-5xl mx-auto text-center ${isContentVisible ? 'animate-in slide-in-from-bottom duration-1000' : 'opacity-0'}`}>
+          {/* 情绪状态显示 */}
+          <div className="tech-card p-8 mb-12 relative overflow-hidden">
+            <div className="absolute inset-0 data-stream opacity-30"></div>
+            <div className="relative z-10">
+              <div className="w-24 h-24 mx-auto mb-6 relative">
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm flex items-center justify-center tech-card">
+                  <span className="text-5xl">{moodInfo.emoji}</span>
+                </div>
+                <div className="absolute inset-0 rounded-full border-2 border-blue-400/30 animate-spin-slow"></div>
+              </div>
+              <h1 className="tech-title text-3xl md:text-4xl mb-3">
+                {moodInfo.title}
+              </h1>
+              <div className="tech-font text-sm text-gray-400 tracking-wider uppercase">
+                Neural Healing Protocol Active
+              </div>
+            </div>
           </div>
 
           {/* AI 生成的疗愈文案 */}
-          <div className={`${styles.textContainer} mb-20`}>
-            <p className={`${styles.healingText} ${isTyping ? styles.typing : ''} ${isContentVisible ? styles.visible : ''}`}>
-              {displayedText}
-              {isTyping && <span className={styles.cursor}>|</span>}
-            </p>
+          <div className="tech-card p-10 mb-12 relative">
+            <div className="absolute top-4 right-4 flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs tech-font text-green-400">AI Processing</span>
+            </div>
+            
+            <div className="relative z-10">
+              {isTyping && (
+                <div className="flex items-center justify-center mb-6">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                    <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                  </div>
+                </div>
+              )}
+              
+              <p className={`text-lg md:text-xl text-gray-200 leading-relaxed font-light ${isTyping ? 'animate-pulse' : ''} relative`}>
+                <span className="absolute inset-0 text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text blur-sm -z-10">
+                  {displayedText}
+                </span>
+                {displayedText}
+                {isTyping && <span className="text-purple-400 animate-pulse">_</span>}
+              </p>
+            </div>
           </div>
 
           {/* 底部操作区域 */}
-          <div className={`${styles.bottomActions} ${isContentVisible ? styles.visible : ''}`}>
+          <div className={`${isContentVisible ? 'animate-in slide-in-from-bottom duration-1000 delay-300' : 'opacity-0'}`}>
             {!showInputOption ? (
               <button
                 onClick={() => setShowInputOption(true)}
-                className={styles.talkMoreButton}
+                className="tech-button group"
               >
-                <i className="fas fa-comment-dots mr-2"></i>
-                我想多说两句
+                <i className="fas fa-microchip mr-2 group-hover:animate-pulse"></i>
+                启动神经对话接口
               </button>
             ) : (
-              <div className={styles.inputContainer}>
+              <div className="tech-card p-6 max-w-2xl mx-auto">
                 <textarea
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="在这里告诉我更多你的想法..."
-                  className={styles.textInput}
-                  rows={3}
+                  placeholder="输入您的想法... 神经网络将为您提供深度分析..."
+                  className="tech-input min-h-[120px] resize-none mb-4"
                   maxLength={300}
                   autoFocus
                 />
-                <div className={styles.inputActions}>
+                <div className="flex justify-center space-x-4">
                   <button
                     onClick={() => {
                       setShowInputOption(false);
                       setUserInput('');
                     }}
-                    className={styles.cancelButton}
+                    className="px-6 py-3 border border-gray-600 text-gray-300 rounded-xl hover:border-gray-500 hover:text-gray-200 transition-all duration-300 hover:scale-105"
                   >
+                    <i className="fas fa-times mr-2"></i>
                     取消
                   </button>
                   <button
                     onClick={handleSubmitInput}
                     disabled={!userInput.trim()}
-                    className={styles.submitButton}
+                    className="tech-button disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    发送
+                    <i className="fas fa-paper-plane mr-2"></i>
+                    发送神经信号
                   </button>
                 </div>
               </div>
@@ -264,17 +351,6 @@ const ImmersiveHealingPage: React.FC = () => {
           </div>
         </div>
       </main>
-
-      {/* 装饰性粒子效果 */}
-      <div className={styles.particleContainer}>
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className={`${styles.particle} ${styles[`particle-${i + 1}`]}`}
-            style={{ animationDelay: `${i * 0.5}s` }}
-          />
-        ))}
-      </div>
     </div>
   );
 };

@@ -178,3 +178,67 @@
     color: rgba(255, 255, 255, 0.4);
 }
 
+/* 7. 高科技网格动画 */
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* 8. 粒子动画增强 */
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.particle {
+    animation: particleFloat 8s ease-in-out infinite;
+}
+
+/* 9. 入场动画增强 */
+@keyframes slideInFromBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-in {
+    animation: slideInFromBottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 10. 科技光效 */
+@keyframes techGlow {
+    0%, 100% {
+        box-shadow: 
+            0 0 20px rgba(59, 130, 246, 0.3),
+            0 0 40px rgba(139, 92, 246, 0.2),
+            inset 0 0 20px rgba(59, 130, 246, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 0 30px rgba(59, 130, 246, 0.5),
+            0 0 60px rgba(139, 92, 246, 0.3),
+            inset 0 0 30px rgba(139, 92, 246, 0.15);
+    }
+}
+
+.tech-glow {
+    animation: techGlow 2s ease-in-out infinite;
+}
+

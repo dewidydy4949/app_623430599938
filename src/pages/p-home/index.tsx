@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAudioManager } from '../../audio/AudioManager';
 import styles from './styles.module.css';
 
 // 心情选项配置
@@ -129,6 +130,17 @@ const FlowBotHome: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const navigate = useNavigate();
+  const { unlockAndPlay, fadeInPlay } = useAudioManager();
+
+  // 情绪到音频轨道的映射
+  const moodAudioMapping: Record<string, string> = {
+    overthinking: 'rain-ambient',
+    heartache: 'soft-piano',
+    insomnia: 'sleep-music',
+    sadness: 'nature-sounds',
+    anxiety: 'meditation',
+    exhausted: 'relaxing-nature'
+  };
 
   useEffect(() => {
     const originalTitle = document.title;
@@ -161,11 +173,24 @@ const FlowBotHome: React.FC = () => {
     setShowSubTags(true);
   };
 
-  const handleSubTagSelect = (subTagId: string) => {
-    if (isTransitioning) return;
+  const handleSubTagSelect = async (subTagId: string) => {
+    if (isTransitioning || !currentMoodForSubTags) return;
     
     setShowSubTags(false);
     setIsTransitioning(true);
+
+    // 获取对应的音频轨道
+    const audioTrack = moodAudioMapping[currentMoodForSubTags];
+    
+    // 立即解锁并播放音频（用户交互触发）
+    if (audioTrack) {
+      try {
+        await unlockAndPlay(audioTrack);
+        console.log(`Audio unlocked and playing: ${audioTrack}`);
+      } catch (error) {
+        console.error('Failed to unlock and play audio:', error);
+      }
+    }
     
     // 延迟导航到疗愈页面，带子标签参数
     setTimeout(() => {
@@ -180,94 +205,108 @@ const FlowBotHome: React.FC = () => {
   };
 
   return (
-    <div className={`${styles.pageWrapper} min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden`}>
-      {/* 动态星云背景 */}
-      <div className={styles.nebulaBackground}>
-        <div className={styles.nebulaLayer1}></div>
-        <div className={styles.nebulaLayer2}></div>
-        <div className={styles.nebulaLayer3}></div>
-        <div className={styles.starsContainer}>
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className={styles.star}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`
-              }}
-            />
-          ))}
-        </div>
+    <div className="relative min-h-screen flex flex-col items-center justify-center px-6 py-12 overflow-hidden">
+      {/* 高科技背景 */}
+      <div className="particle-container">
+        {[...Array(40)].map((_, i) => (
+          <div 
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 8}s`,
+              animationDuration: `${8 + Math.random() * 6}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* 动态网格背景 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px',
+          animation: 'gridMove 12s linear infinite'
+        }} />
+      </div>
+
+      {/* 光效装饰 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '3s'}} />
+        <div className="absolute top-1/2 right-1/3 w-[500px] h-[500px] bg-pink-500/5 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '5s'}} />
       </div>
       
       {/* 主要内容 */}
-      <div className="relative z-10 w-full max-w-4xl">
+      <div className="relative z-10 w-full max-w-6xl">
         {/* 时间显示 */}
         <div className="text-center mb-12">
-          <div className={`inline-block px-6 py-3 ${styles.glassCard} mb-8`}>
-            <div className={`text-3xl font-light tracking-wide ${styles.timeDisplay}`}>{currentTime}</div>
-            <div className={`text-sm ${styles.subtitle}`}>深夜时刻</div>
+          <div className="tech-card inline-block px-8 py-4 data-stream">
+            <div className="tech-font text-4xl mb-2 glow-text">{currentTime}</div>
+            <div className="text-sm text-gray-400 tech-font">SYSTEM TIME</div>
           </div>
         </div>
 
         {/* 标题 */}
         <div className="text-center mb-16">
-          <h1 className={`text-4xl md:text-5xl mb-6 leading-tight ${styles.mainTitle}`}>
-            今晚，<span className="font-medium">你的心情是</span>？
+          <h1 className="tech-title text-5xl md:text-6xl mb-6">
+            今晚，<span className="font-light text-gray-300">情绪状态</span>？
           </h1>
-          <p className={`text-lg max-w-2xl mx-auto ${styles.subtitle}`}>
-            选择最贴合你此刻感受的卡片，让我为你准备一份专属的疗愈体验
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto tracking-wide">
+            选择最符合您当前情绪状态的模块，系统将为您匹配专属的神经疗愈方案
           </p>
         </div>
 
-        {/* 心情卡片网格 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        {/* 情绪模块网格 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {moodOptions.map((mood) => (
             <div
               key={mood.id}
               onClick={() => handleMoodSelect(mood.id)}
-              className={`relative group cursor-pointer transform transition-all duration-700 ${
-                selectedMood === mood.id ? 'scale-95 opacity-0' : 'scale-100 opacity-100 hover:scale-102'
-              } ${selectedMood && selectedMood !== mood.id ? 'opacity-50' : ''}`}
+              className={`relative group cursor-pointer transition-all duration-700 ${
+                selectedMood === mood.id ? 'scale-95 opacity-0' : 'scale-100 opacity-100 hover:scale-105'
+              } ${selectedMood && selectedMood !== mood.id ? 'opacity-40' : ''}`}
             >
-              <div className={`${styles.glassCard} p-8 h-full min-h-[200px] flex flex-col items-center justify-center text-center relative`}>
-                {/* 毛玻璃背景层 */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl" />
-                <div className={`absolute inset-0 bg-gradient-to-br ${mood.gradient} opacity-0 group-hover:opacity-15 transition-all duration-700 rounded-3xl`} />
+              <div className="tech-card p-8 h-full min-h-[220px] flex flex-col items-center justify-center text-center relative overflow-hidden">
+                {/* 数据流效果 */}
+                <div className="absolute inset-0 data-stream opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
-                {/* 边框光效 */}
-                <div className="absolute inset-0 rounded-3xl border border-white/10 group-hover:border-white/20 transition-all duration-500" />
-                <div className={`absolute inset-0 rounded-3xl shadow-lg group-hover:shadow-2xl transition-all duration-700 ${styles.glowShadow}`} 
-                     style={{ '--glow-color': mood.gradient.includes('purple') ? '#6366f1' : 
-                                    mood.gradient.includes('pink') ? '#ec4899' : 
-                                    mood.gradient.includes('blue') ? '#3b82f6' : 
-                                    mood.gradient.includes('gray') ? '#6b7280' : 
-                                    mood.gradient.includes('orange') ? '#f97316' : '#10b981' } as React.CSSProperties} />
+                {/* 动态渐变背景 */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${mood.gradient} opacity-0 group-hover:opacity-20 transition-all duration-700`} />
+                
+                {/* 科技边框 */}
+                <div className="glow-border absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 {/* 内容层 */}
                 <div className="relative z-10">
-                  {/* 图标 */}
-                  <div className={`text-6xl mb-4 transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-lg`}>
-                    {mood.emoji}
+                  {/* 图标容器 */}
+                  <div className="relative mb-4">
+                    <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <span className="text-3xl">{mood.emoji}</span>
+                    </div>
+                    {/* 环绕动画 */}
+                    <div className="absolute inset-0 rounded-full border-2 border-white/20 group-hover:animate-spin-slow"></div>
                   </div>
                   
                   {/* 标题 */}
-                  <h3 className="text-xl font-medium text-white mb-3 drop-shadow-sm">
+                  <h3 className="text-xl font-semibold text-white mb-3 tech-font tracking-wide">
                     {mood.title}
                   </h3>
                   
                   {/* 描述 */}
-                  <p className="text-sm text-white/80 leading-relaxed">
+                  <p className="text-sm text-gray-300 leading-relaxed">
                     {mood.description}
                   </p>
                 </div>
                 
-                {/* 悬停时的微光效果 */}
-                <div className="absolute top-0 left-0 w-full h-full rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute top-2 left-2 w-2 h-2 bg-white/40 rounded-full blur-sm" />
-                  <div className="absolute bottom-2 right-2 w-3 h-3 bg-white/30 rounded-full blur-md" />
+                {/* 悬停时的光点效果 */}
+                <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                  <div className="absolute top-2 left-2 w-1 h-1 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 animate-ping" />
+                  <div className="absolute bottom-2 right-2 w-1 h-1 bg-purple-400 rounded-full opacity-0 group-hover:opacity-100 animate-ping" style={{animationDelay: '0.5s'}} />
+                  <div className="absolute top-1/2 right-2 w-1 h-1 bg-pink-400 rounded-full opacity-0 group-hover:opacity-100 animate-ping" style={{animationDelay: '1s'}} />
                 </div>
               </div>
             </div>
@@ -276,9 +315,12 @@ const FlowBotHome: React.FC = () => {
 
         {/* 底部提示 */}
         <div className="text-center">
-          <p className="text-sm text-text-tertiary/60 animate-pulse">
-            点击卡片，开启你的疗愈之旅
-          </p>
+          <div className="tech-card inline-block px-6 py-3">
+            <p className="text-sm text-gray-400 tech-font tracking-wider animate-pulse">
+              <i className="fas fa-hand-pointer mr-2"></i>
+              触碰模块以启动神经疗愈程序
+            </p>
+          </div>
         </div>
       </div>
 

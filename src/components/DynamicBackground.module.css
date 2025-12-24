@@ -5,7 +5,17 @@
   width: 100%;
   height: 100%;
   z-index: -1;
-  transition: background 1s ease-in-out;
+  transition: all 1s ease-in-out;
+  overflow: hidden;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
 }
 
 .overlay {
@@ -15,6 +25,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .particles {
@@ -25,27 +36,145 @@
 
 .particle {
   position: absolute;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
+  width: 2px;
+  height: 2px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
   border-radius: 50%;
-  animation: float linear infinite;
+  animation: particleFloat linear infinite;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 15s linear infinite;
+}
+
+.gridLine {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(139, 92, 246, 0.3), transparent);
+  animation: gridPulse 3s ease-in-out infinite;
+}
+
+.glowEffects {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 
-@keyframes float {
+.glowOrb {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+  filter: blur(30px);
+  transition: all 0.3s ease;
+}
+
+.glowOrb.static {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+.glowOrb:not(.static) {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+}
+
+.dataStreams {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dataStream {
+  position: absolute;
+  top: -10%;
+  width: 2px;
+  height: 20%;
+  background: linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.8), transparent);
+  animation: dataFlow linear infinite;
+  filter: blur(1px);
+}
+
+/* 动画定义 */
+@keyframes particleFloat {
   0% {
-    transform: translateY(100vh) translateX(0);
+    transform: translateY(100vh) rotate(0deg);
     opacity: 0;
   }
   10% {
-    opacity: 0.4;
+    opacity: 0.8;
   }
   90% {
-    opacity: 0.4;
+    opacity: 0.8;
   }
   100% {
-    transform: translateY(-100px) translateX(100px);
+    transform: translateY(-100px) rotate(720deg);
     opacity: 0;
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes gridPulse {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+@keyframes dataFlow {
+  0% {
+    top: -10%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }
